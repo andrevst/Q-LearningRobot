@@ -3,20 +3,52 @@ using System.Collections;
 
 public class QLearning
 {
-	private State[,] statesMap;
-	private State currentState	= null;
-	private State initialState	= null;
-	private State finalState	= null;
+	private State[,] _statesMap;
+	private State _currentState	= null;
+	private State _initialState	= null;
+	private State _finalState	= null;
 
-	private int iterations	= Data.BASE_ITERATIONS;
-	private float alpha		= Data.BASE_LEARNING_RATE;
-	private float delta		= Data.BASE_DISCOUNT;
+	private int _iterations	= QLData.BASE_ITERATIONS;
+	private float alpha		= QLData.BASE_LEARNING_RATE;
+	private float delta		= QLData.BASE_DISCOUNT;
 
-	private int sizeX;
-	private int sizeY;
+	private int _sizeX;
+	private int _sizeY;
 
-	private int initialX;
-	private int initialY;
+	public State[,] statesMap {
+		get { return _statesMap; }
+	}
+
+	public int sizeX {
+		get { return _sizeX; }
+	}
+
+	public int sizeY {
+		get { return _sizeY; }
+	}
+
+	public State initialState {
+		get { return _initialState; }
+	}
+
+	public State finalState {
+		get { return _finalState; }
+	}
+
+	public State currentState {
+		get { return _currentState; }
+	}
+
+	public int iterations {
+		get { return _iterations; }
+		set {
+				_iterations = value; 
+				if (_iterations < 1) 
+					_iterations = 1;
+				if (_iterations > QLData.MAX_ITERATIONS) 
+					_iterations = QLData.MAX_ITERATIONS;
+		}
+	}
 
 	public QLearning(){}
 
@@ -25,12 +57,10 @@ public class QLearning
 		int initialX,int initialY,
 		int finalX, int finalY)
 	{
-		statesMap = new State[sizeX, sizeY];
+		_statesMap = new State[sizeX, sizeY];
 
-		this.sizeX = sizeX;
-		this.sizeY = sizeY;
-		this.initialX = initialX;
-		this.initialY = initialY;
+		this._sizeX = sizeX;
+		this._sizeY = sizeY;
 
 		for (int x = 0; x < sizeX; x++)
 		{
@@ -41,38 +71,40 @@ public class QLearning
 
 				if (x == 0)
 				{
-					state.GetAction(Data.Direction.Left)
+					state.GetAction(QLData.Direction.Left)
 						.targetState.BlockState();
 				}
 				else if (x == sizeX - 1)
 				{
-					state.GetAction(Data.Direction.Right)
+					state.GetAction(QLData.Direction.Right)
 						.targetState.BlockState();
 				}
 
 				if (y == 0)
 				{
-					state.GetAction(Data.Direction.Up)
+					state.GetAction(QLData.Direction.Up)
 						.targetState.BlockState();
 				}
 				else if (y == sizeY - 1)
 				{
-					state.GetAction(Data.Direction.Down)
+					state.GetAction(QLData.Direction.Down)
 						.targetState.BlockState();
 				}
 
 				if (x == initialX && y == initialY)
 				{
-					initialState = state;
+					state.InitialState();
+					_initialState = state;
+					_currentState = _initialState;
 				}
 
 				if (x == finalX && y == finalY)
 				{
 					state.FinalState();
-					finalState = state;
+					_finalState = state;
 				}
 
-				statesMap[x,y] = state;
+				_statesMap[x,y] = state;
 			}
 		}
 
@@ -82,30 +114,24 @@ public class QLearning
 			{
 				if (x > 0)
 				{
-					statesMap[x,y].GetAction(Data.Direction.Left)
-						.targetState = statesMap[x - 1, y];
+					_statesMap[x,y].GetAction(QLData.Direction.Left)
+						.targetState = _statesMap[x - 1, y];
 				}
 				if (x < sizeX - 1)
 				{
-					statesMap[x,y].GetAction(Data.Direction.Right)
-						.targetState = statesMap[x + 1, y];
+					_statesMap[x,y].GetAction(QLData.Direction.Right)
+						.targetState = _statesMap[x + 1, y];
 				}
 
 				if (y > 0)
 				{
-					statesMap[x,y].GetAction(Data.Direction.Up)
-						.targetState = statesMap[x, y - 1];
+					_statesMap[x,y].GetAction(QLData.Direction.Up)
+						.targetState = _statesMap[x, y - 1];
 				}
 				if (y < sizeY - 1)
 				{
-					statesMap[x,y].GetAction(Data.Direction.Down)
-						.targetState = statesMap[x, y + 1];
-				}
-
-				// REMOVE THIS
-				if (Random.value < 0.1f && statesMap[x,y].IsFinalState() == false)
-				{
-					statesMap[x,y].BlockState();
+					_statesMap[x,y].GetAction(QLData.Direction.Down)
+						.targetState = _statesMap[x, y + 1];
 				}
 			}
 		}
@@ -113,18 +139,24 @@ public class QLearning
 
 	public void Restart()
 	{
-		currentState = initialState;
+		_currentState = _initialState;
 	}
 
-	public void Iterate(bool useExplorationFactor = false)
+	public bool Iterate(bool useExplorationFactor = false, bool canRestart = false)
 	{
-		if (currentState.IsFinalState())
+		if (_currentState == null)
 		{
-			Restart();
+			_currentState = initialState;
+		}
+
+		if (_currentState.IsFinalState())
+		{
+			if (canRestart)	Restart();
+			return true;
 		}
 		else
 		{
-			Action action = currentState.ChooseAction(useExplorationFactor);
+			Action action = _currentState.ChooseAction(useExplorationFactor);
 			if (action != null)
 			{
 				action.Update(
@@ -132,17 +164,20 @@ public class QLearning
 					action.targetState.reward,
 					delta,
 					action.targetState.GreaterQFactor(),
-					currentState);
+					_currentState);
 
-				currentState.UpdateAction(action);
+				_currentState.UpdateAction(action);
 
-				currentState = action.targetState;
+				_currentState = action.targetState;
+
+				return false;
 			}
 			else
 			{
 				// Blocked
 				Debug.Log("Blocked");
-				Restart();
+				if (canRestart)	Restart();
+				return true;
 			}
 		}
 	}
@@ -154,7 +189,7 @@ public class QLearning
 		Restart();
 		for(int i = 0; i < iterations; i++)
 		{
-			Iterate(useExplorationFactor);
+			Iterate(useExplorationFactor, true);
 		}
 			
 		PrintMap("After "+iterations+" iterations; exploration factor used? "+useExplorationFactor);
@@ -163,28 +198,28 @@ public class QLearning
 	public void Loop()
 	{
 		PrintMap();
-		Loop(this.iterations, true);
+		Loop(this._iterations, true);
 		PrintMap();
 	}
 
 	public void PrintMap(string title = "")
 	{
 		string map = "";
-		for (int x = 0; x < sizeX; x++)
+		for (int x = 0; x < _sizeX; x++)
 		{
-			for (int y = 0; y < sizeY; y++)
+			for (int y = 0; y < _sizeY; y++)
 			{
-				if (statesMap[x,y].IsBlockState())
+				if (_statesMap[x,y].IsBlockState())
 				{
 					map += "BLOCK\t";
 				}
-				else if (statesMap[x,y].IsFinalState())
+				else if (_statesMap[x,y].IsFinalState())
 				{
 					map += "FINAL\t";
 				}
 				else
 				{
-					map += statesMap[x,y].GreaterQFactor().ToString("0.00") + "\t";
+					map += _statesMap[x,y].GreaterQFactor().ToString("0.00") + "\t";
 				}
 			}
 			map += "\n";

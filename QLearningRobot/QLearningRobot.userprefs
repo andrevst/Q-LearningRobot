@@ -1,12 +1,17 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Tests\BasicTest.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\Map\Map.cs">
     <Files>
-      <File FileName="Assets\Scripts\Tests\BasicTest.cs" Line="12" Column="18" />
-      <File FileName="Assets\Scripts\Data\Data.cs" Line="1" Column="1" />
-      <File FileName="Assets\Scripts\Core\QLearning.cs" Line="106" Column="70" />
-      <File FileName="Assets\Scripts\Core\State.cs" Line="107" Column="3" />
-      <File FileName="Assets\Scripts\Core\Action.cs" Line="62" Column="5" />
+      <File FileName="Assets\Scripts\Tests\BasicTest.cs" Line="12" Column="26" />
+      <File FileName="Assets\Scripts\Tests\VisualTest.cs" Line="18" Column="3" />
+      <File FileName="Assets\Scripts\Core\State.cs" Line="119" Column="28" />
+      <File FileName="Assets\Scripts\Core\QLearning.cs" Line="192" Column="38" />
+      <File FileName="Assets\Scripts\Core\Action.cs" Line="6" Column="1" />
+      <File FileName="Assets\Scripts\Map\Robot.cs" Line="66" Column="4" />
+      <File FileName="Assets\Scripts\Map\MapTile.cs" Line="45" Column="25" />
+      <File FileName="Assets\Scripts\Interface\DisplayTile.cs" Line="40" Column="16" />
+      <File FileName="Assets\Scripts\Data\QLData.cs" Line="4" Column="27" />
+      <File FileName="Assets\Scripts\Map\Map.cs" Line="41" Column="18" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

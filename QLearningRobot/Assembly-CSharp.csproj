@@ -48,8 +48,15 @@
      <Compile Include="Assets\Scripts\Core\Action.cs" />
      <Compile Include="Assets\Scripts\Core\QLearning.cs" />
      <Compile Include="Assets\Scripts\Core\State.cs" />
-     <Compile Include="Assets\Scripts\Data\Data.cs" />
+     <Compile Include="Assets\Scripts\Data\MapData.cs" />
+     <Compile Include="Assets\Scripts\Data\QLData.cs" />
+     <Compile Include="Assets\Scripts\Data\ScreenData.cs" />
+     <Compile Include="Assets\Scripts\Interface\DisplayTile.cs" />
+     <Compile Include="Assets\Scripts\Map\Map.cs" />
+     <Compile Include="Assets\Scripts\Map\MapTile.cs" />
+     <Compile Include="Assets\Scripts\Map\Robot.cs" />
      <Compile Include="Assets\Scripts\Tests\BasicTest.cs" />
+     <Compile Include="Assets\Scripts\Tests\VisualTest.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
  </Reference>

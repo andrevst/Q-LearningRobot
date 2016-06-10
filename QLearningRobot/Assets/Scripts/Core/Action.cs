@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Action
 {
-	private Data.Direction _direction	= Data.Direction.Up;
+	private QLData.Direction _direction	= QLData.Direction.Up;
 	private State _targetState			= null;
 	private float _qFactor 				= 0;
 
@@ -14,7 +14,7 @@ public class Action
 		get { return _targetState; }
 		set { _targetState = value; }
 	}
-	public Data.Direction direction {
+	public QLData.Direction direction {
 		get { return _direction; }
 	}
 
@@ -36,13 +36,13 @@ public class Action
 		this._targetState 	= targetState;
 	}
 
-	public Action (State targetState, Data.Direction direction)
+	public Action (State targetState, QLData.Direction direction)
 	{
 		this._targetState 	= targetState;
 		this._direction 	= direction;
 	}
 
-	public Action(float qFactor, State targetState, Data.Direction direction)
+	public Action(float qFactor, State targetState, QLData.Direction direction)
 	{
 		this._qFactor 		= qFactor;	
 		this._targetState 	= targetState;

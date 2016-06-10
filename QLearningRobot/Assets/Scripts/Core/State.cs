@@ -4,17 +4,30 @@ using System.Collections.Generic;
 
 public class State
 {
-	private int x	= 0;
-	private int y	= 0;
+	private int _x	= 0;
+	private int _y	= 0;
 
 	private List<Action> _actionList	= new List<Action>();
-	private float _reward				= Data.BASIC_REWARD;
+	private float _reward				= QLData.BASIC_REWARD;
+
+	private QLData.StateType _type	= QLData.StateType.Normal;
 
 	public List<Action> actionList {
 		get { return _actionList; }
 	}
 	public float reward {
 		get { return _reward; }
+	}
+
+	public QLData.StateType type {
+		get { return _type; }
+	}
+
+	public int x {
+		get { return _x; }
+	}
+	public int y {
+		get { return _y; }
 	}
 
 	public State(){}
@@ -37,43 +50,52 @@ public class State
 
 	public State(int x, int y)
 	{
-		this.x = x;
-		this.y = y;
+		this._x = x;
+		this._y = y;
 	}
 
 	public State(int x, int y, float reward)
 	{
-		this.x = x;
-		this.y = y;
+		this._x = x;
+		this._y = y;
 		this._reward = reward;
 	}
 
 	public State(int x, int y, float reward, List<Action> actionList)
 	{
-		this.x = x;
-		this.y = y;
+		this._x = x;
+		this._y = y;
 		this._reward = reward;
 		this._actionList = actionList;
 	}
 
 	public void FinalState()
 	{
-		this._reward = Data.FINAL_REWARD;
+		this._reward 	= QLData.FINAL_REWARD;
+		this._type		= QLData.StateType.Final;
 	}
 
 	public void NormalState()
 	{
-		this._reward = Data.BASIC_REWARD;
+		this._reward 	= QLData.BASIC_REWARD;
+		this._type		= QLData.StateType.Normal;
 	}
 
 	public void BlockState(bool border = false)
 	{
-		this._reward = Data.BLOCK_REWARD;
+		this._reward 	= QLData.BLOCK_REWARD;
+		this._type		= QLData.StateType.Block;
 		if (border)
 		{
-			x = -1;
-			y = -1;
+			_x = -1;
+			_y = -1;
 		}
+	}
+
+	public void InitialState()
+	{
+		this._reward 	= QLData.BASIC_REWARD;
+		this._type		= QLData.StateType.Initial;
 	}
 
 	public void RemoveBlock()
@@ -86,17 +108,22 @@ public class State
 
 	public bool IsBlockState()
 	{
-		return this._reward == Data.BLOCK_REWARD;
+		return this._type == QLData.StateType.Block;
 	}
 
 	public bool IsFinalState()
 	{
-		return this._reward == Data.FINAL_REWARD;
+		return this._type == QLData.StateType.Final;
+	}
+
+	public bool IsInitialState()
+	{
+		return this._type == QLData.StateType.Initial;
 	}
 
 	public void CreateActions()
 	{
-		foreach(Data.Direction direction in Data.POSSIBLE_DIRECTIONS)
+		foreach(QLData.Direction direction in QLData.POSSIBLE_DIRECTIONS)
 		{
 			_actionList.Add(new Action(new State(), direction));
 		}
@@ -104,7 +131,7 @@ public class State
 
 	public float GreaterQFactor()
 	{
-		float greaterQ = Data.BASIC_REWARD;
+		float greaterQ = QLData.BASIC_REWARD;
 		foreach(Action action in _actionList)
 		{
 			if (action.qFactor > greaterQ)
@@ -130,7 +157,7 @@ public class State
 
 	public Action ChooseAction(bool useExplorationFactor = false)
 	{
-		float greaterQ = Data.BASIC_REWARD;
+		float greaterQ = QLData.BASIC_REWARD;
 		Action bestAction = null;
 		List<Action> possibleActions = new List<Action>();
 
@@ -154,7 +181,7 @@ public class State
 
 		float explorationFactor = Random.Range(0f, 1f);
 		if (bestAction == null || (useExplorationFactor &&
-			explorationFactor < Data.EXPLORATION_FACTOR))
+			explorationFactor < QLData.EXPLORATION_FACTOR))
 		{
 			return possibleActions[Random.Range(0, possibleActions.Count)];
 		}
@@ -164,7 +191,7 @@ public class State
 			return bestAction;
 		}
 
-		float threshold = Data.THRESHOLD_FACTOR * bestAction.qFactor;
+		float threshold = QLData.THRESHOLD_FACTOR * bestAction.qFactor;
 		List<Action> thresholdActions = new List<Action>();
 		foreach(Action action in _actionList)
 		{
@@ -177,7 +204,7 @@ public class State
 		return thresholdActions[Random.Range(0, thresholdActions.Count)];
 	}
 
-	public Action GetAction(Data.Direction direction)
+	public Action GetAction(QLData.Direction direction)
 	{
 		foreach(Action action in _actionList)
 		{
